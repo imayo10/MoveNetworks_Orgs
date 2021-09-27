@@ -11,7 +11,7 @@ dashboard = meraki.DashboardAPI(credentials.api_key)
 arr = input(f"\nType the tags to filter the networks that you want to change organization, separate them by a space: " )
 l = list(arr.split(" "))
 
-#Set your organization id origin
+#Set your source organization id
 
 organization_id = XXXXXXXXXXXXXXXX
 
@@ -110,7 +110,7 @@ with open('inventory.csv', 'r') as read_obj:
 # Get the number of stores within the CSV
 num_tiendas = len(list_tiendas)
 
-# Source organization ID and destination Org id
+# Set Source organization ID and destination Org id
 org_orig = 'XXXXXXXXXXXX'
 org_dest = 'ZZZZZZZZZZZZ'
 
