@@ -132,11 +132,11 @@ while count < num_tiendas:
     # remove devices from the origin network
     removes1 = dashboard.networks.removeNetworkDevices(netid, s1)
     if s2 == '':
-        print ('Tienda solo con MX')
+        print ('Only MX on the network')
     else:
         removes2 = dashboard.networks.removeNetworkDevices(netid, s2)
     if s3 == '':
-        print ('Tienda sin MR')
+        print ('no MR on the network')
     else:
         removes3 = dashboard.networks.removeNetworkDevices(netid, s3)
 
