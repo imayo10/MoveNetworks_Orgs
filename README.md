@@ -13,6 +13,10 @@ Considerations
 - All networks have a Meraki MX
 - An override of 4 vlans is made, to preserve the addressing the network had in the original organization.
 - For this project, a maximum of 3 devices per network is considered (1 MS, 1MR, 1MX), this can be modified if necessary.
+- For my project this combinations of devices are allowed
+  - 1 MX
+  - 1 MX + 1 MS
+  - 1 MX + 1 MS + 1 MR
 
 How it works.
 
