@@ -21,7 +21,7 @@ networks = dashboard.organizations.getOrganizationNetworks(
 # Record number of networks
 num_networks = len(networks)
 
-# header of the CSV File
+# header of the CSV File, this could be changed based on your needs, in my project I need all this values
 header = ['Free', 'NetworkID', 'Name', 'Tag1', 'Tag2', 'Tag3', 'Tag4', 'Tag5', Direccion', 'Serial1', 'Serial2', 'Serial3', 'Nombre', 'VLAN10', 'SVI10', 'VLAN20', 'SVI20', 'VLAN30', 'SVI30', 'VLAN40', 'SVI40']
 
 # write header into CSV named inventario.csv
@@ -133,30 +133,32 @@ while count < num_tiendas:
 
         # remove devices from the origin network
         removes1 = dashboard.networks.removeNetworkDevices(netid, s1)
+        time.sleep(2)
+        licenses1 = dashboard.organizations.getOrganizationLicenses(org_orig, deviceSerial=s1)
+        s1_lic = (licenses1[0]['id'])
+        nid1 = (licenses1[0]['networkId'])
+        print(s1_lic)
+        print(nid1)
         if s2 == '':
             print ('Only MX on the network')
         else:
             removes2 = dashboard.networks.removeNetworkDevices(netid, s2)
+            time.sleep(2)
+            licenses2 = dashboard.organizations.getOrganizationLicenses(org_orig, deviceSerial=s2)
+            s2_lic = (licenses2[0]['id'])
+            nid2 = (licenses2[0]['networkId'])
+            print(s2_lic)
+            print(nid2)
         if s3 == '':
             print ('no MR on the network')
         else:
             removes3 = dashboard.networks.removeNetworkDevices(netid, s3)
-
-        # get licenses from source org
-        licenses = dashboard.organizations.getOrganizationLicenses(org_orig, total_pages='all')
-
-        # get license (license id) for each serial (device on the network)
-        for s in range(len(licenses)):
-            if s1 == licenses[s]['deviceSerial']:
-                s1_lic = (licenses[s]['id'])
-            elif s2 == licenses[s]['deviceSerial']:
-                s2_lic = (licenses[s]['id'])
-            elif s2 == '':
-                print ('MX only')
-            elif s3 == licenses[s]['deviceSerial']:
-                s3_lic = (licenses[s]['id'])
-            elif s3 == '':
-                print ('no MR in the network')
+            time.sleep(2)
+            licenses3 = dashboard.organizations.getOrganizationLicenses(org_orig, deviceSerial=s3)
+            s3_lic = (licenses3[0]['id'])
+            nid3 = (licenses3[0]['networkId'])
+            print(s3_lic)
+            print(nid3)
 
         if s2 == '' and s3 == '':
             license_ids = [s1_lic]
@@ -191,24 +193,11 @@ while count < num_tiendas:
             serials = [s1, s2, s3]
 
         claim = dashboard.networks.claimNetworkDevices(network_new, serials)
-
-        # Set a name and address to the devices in the network.
-        address = list_tiendas[count]['Direccion']
-        print (address)
-        nombre = list_tiendas[count]['Nombre']
-        print (nombre)
-
-        update_device_s1 = dashboard.devices.updateDevice(s1, name=nombre , address=address, moveMapMarker='true')
-        if s2 != '':
-            update_device_s2 = dashboard.devices.updateDevice(s2, name=nombre, address=address, moveMapMarker='true')
-        else:
-            print ('Tienda solo con MX')
-        if s3 != '':
-            update_device_s3 = dashboard.devices.updateDevice(s3, name=nombre, address=address, moveMapMarker='true')
-        else:
-            print ('Tienda sin MR')
-
+          
         # Bind the new network to a template
+        # If you want, you can only set the template id manually, instead of asking the user which is the destination template for every network.
+        # template = 'XXXXXXXXXXXXXXXXXXXX'
+        
 
         available_templates = dashboard.organizations.getOrganizationConfigTemplates(org_dest)
 
@@ -225,7 +214,7 @@ while count < num_tiendas:
         template = available_templates[int(user_selection)]
 
         bind = dashboard.networks.bindNetwork(network_new, template['id'],autoBind=True)
-
+        
         # Override the addressing in 4 vlans, if you dont need to override the subnets of the vlans, comment this section.
         vlan_id1 = 10
         vlan_id2 = 20
@@ -259,6 +248,40 @@ while count < num_tiendas:
             subnet=VLAN40,
             applianceIp=SVI40,
         )
+
+        # Set a name and address of the devices in the network.
+        address = list_tiendas[count]['Direccion']
+        print (address)
+        nombre = list_tiendas[count]['Nombre']
+        print (nombre)
+
+        update_device_s1 = dashboard.devices.updateDevice(s1, name=nombre , address=address, moveMapMarker='true', 
+                                                          tags=[tag1.replace(" ", ""),
+                                                                tag2.replace(" ", ""),
+                                                                tag3.replace(" ", ""),
+                                                                tag4.replace(" ", "")
+                                                                ])
+                                                                              
+        if s2 != '':
+            update_device_s2 = dashboard.devices.updateDevice(s2, name=nombre, address=address, moveMapMarker='true', 
+                                                          tags=[tag1.replace(" ", ""),
+                                                                tag2.replace(" ", ""),
+                                                                tag3.replace(" ", ""),
+                                                                tag4.replace(" ", "")
+                                                                ])
+        else:
+            print ('Network with MX only')
+        if s3 != '':
+            update_device_s3 = dashboard.devices.updateDevice(s3, name=nombre, address=address, moveMapMarker='true', 
+                                                          tags=[tag1.replace(" ", ""),
+                                                                tag2.replace(" ", ""),
+                                                                tag3.replace(" ", ""),
+                                                                tag4.replace(" ", "")
+                                                                ])
+        else:
+            print ('Network without MR')
+
+        
         # the counter is incremented to run the routine in the next network defined in the CSV.
         count = count+1
           
@@ -266,3 +289,5 @@ while count < num_tiendas:
         print(e)
     except meraki.APIError as e:
         print(e)
+        print('--failure trying to move the network, check logs--')
+        count = count+1
