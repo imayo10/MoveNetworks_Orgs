@@ -25,7 +25,7 @@ num_networks = len(networks)
 header = ['Free', 'NetworkID', 'Name', 'Tag1', 'Tag2', 'Tag3', 'Tag4', 'Tag5', Direccion', 'Serial1', 'Serial2', 'Serial3', 'Nombre', 'VLAN10', 'SVI10', 'VLAN20', 'SVI20', 'VLAN30', 'SVI30', 'VLAN40', 'SVI40']
 
 # write header into CSV named inventario.csv
-with open ('inventario.csv', 'w', encoding='UTF8', newline='') as f:
+with open ('inventory.csv', 'w', encoding='UTF8', newline='') as f:
     writer = csv.writer(f)
     writer.writerow(header)
 
